@@ -1,9 +1,8 @@
 const express = require('express');
-const router = express.Router()
+const router = express.Router();
 
-router.get('/', (req, res)=> {
-  res.send(`Res sent from user.js updated ${Date().toLocaleString()}`);
+const { sayHi } = require('../controllers/user.js');
 
-})
+router.get('/say', sayHi)
 
 module.exports = router;
