@@ -1,6 +1,6 @@
 const User = require("../models/user");
 const jwt = require("jsonwebtoken"); // to generate signed token
-const expressJwt = require("express-jwt"); // for authorization check
+const { expressjwt } = require("express-jwt"); // for authorization check
 const { errorHandler } = require("../helpers/dbErrorHandler");
 
 exports.signup = (req, res) => {
@@ -21,13 +21,10 @@ exports.signup = (req, res) => {
 };
 
 exports.signin = (req, res) => {
-  console.log("you got this far");
   // find the user based on email
   const { email, password } = req.body;
   User.findOne({ email }, (err, user) => {
-    console.log("Finding user based on email");
     if (err || !user) {
-      console.log("err || !user");
       return res.status(400).json({
         error: "User with that email does not exist. Please signup",
       });
@@ -35,13 +32,11 @@ exports.signin = (req, res) => {
     // if user is found make sure the email and password match
     // create authenticate method in user model
     if (!user.authenticate(password)) {
-      console.log('authenticated didn"t work');
       return res.status(401).json({
         error: "Email and password dont match",
       });
     }
     // generate a signed token with user id and secret
-    console.log(process.env);
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
     // persist the token as 't' in cookie with expiry date
     res.cookie("t", token, { expire: new Date() + 9999 });
@@ -55,3 +50,11 @@ exports.signout = (req, res) => {
   res.clearCookie("t");
   res.json({ message: "Signout success" });
 };
+
+console.log(expressjwt);
+
+exports.requireSignin = expressjwt({
+  secret: process.env.JWT_SECRET,
+  algorithms: ["HS256"], // added later
+  userProperty: "auth",
+});
