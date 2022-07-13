@@ -60,6 +60,7 @@ exports.requireSignin = expressjwt({
 exports.isAuth = (req, res, next) => {
   let user = req.profile && req.auth && req.profile._id == req.auth._id;
   if (!user) {
+    console.log(req);
     return res.status(403).json({
       error: "Access denied",
     });
